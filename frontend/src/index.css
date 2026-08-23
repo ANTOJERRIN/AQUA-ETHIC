@@ -1,0 +1,425 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────────
+   RIVER DESIGN SYSTEM — CSS CUSTOM PROPERTIES
+   Source: 6_STYLE_GUIDE.md §2
+───────────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --bg-primary: #0B0F17;
+  --bg-surface: #131A26;
+  --bg-surface-elevated: #1B2432;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-emphasis: rgba(255, 255, 255, 0.16);
+
+  /* Text */
+  --text-primary: #F5F7FA;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  /* Brand */
+  --accent-blue: #2E7CD6;
+  --accent-blue-light: #60A5FA;
+  --accent-blue-glow: rgba(59, 130, 246, 0.35);
+
+  /* Status */
+  --status-safe: #22C55E;
+  --status-safe-glow: rgba(34, 197, 94, 0.3);
+  --status-caution: #F59E0B;
+  --status-caution-glow: rgba(245, 158, 11, 0.3);
+  --status-risk: #EF4444;
+  --status-risk-glow: rgba(239, 68, 68, 0.3);
+
+  /* Radii & shadow */
+  --radius-card: 20px;
+  --radius-pill: 999px;
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+/* Light mode overrides (§2) */
+[data-theme="light"] {
+  --bg-primary: #F7F9FC;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #F0F3F8;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --shadow-card: 0 8px 32px rgba(15, 23, 42, 0.08);
+}
+
+/* ─────────────────────────────────────────────
+   BASE TYPOGRAPHY
+   Source: 6_STYLE_GUIDE.md §3
+───────────────────────────────────────────── */
+@layer base {
+  body {
+    font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.9375rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+  }
+
+  h1 { font-size: 2.25rem;  font-weight: 800; letter-spacing: -0.02em; }
+  h2 { font-size: 1.375rem; font-weight: 700; }
+  h3 { font-size: 1.125rem; font-weight: 600; }
+  h4 { font-size: 0.9375rem; font-weight: 600; }
+}
+
+/* ─────────────────────────────────────────────
+   TYPOGRAPHY UTILITIES
+   Source: 6_STYLE_GUIDE.md §3
+───────────────────────────────────────────── */
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.metric-unit {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+i, em, .tagline {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* ─────────────────────────────────────────────
+   LOGO TREATMENT
+   Source: 6_STYLE_GUIDE.md §1
+───────────────────────────────────────────── */
+.river-logo {
+  font-family: 'Playfair Display', 'Georgia', serif;
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #60A5FA 0%, #2E7CD6 60%, #1E5FA8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+
+.river-logo--header {
+  font-size: 1.75rem;
+}
+
+.river-logo--hero {
+  font-size: 4rem;
+  animation: logo-pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ─────────────────────────────────────────────
+   CARD
+   Source: 6_STYLE_GUIDE.md §4
+───────────────────────────────────────────── */
+.river-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.river-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-emphasis);
+}
+
+/* ─────────────────────────────────────────────
+   STATUS BADGE (pill, with glow)
+   Source: 6_STYLE_GUIDE.md §4
+───────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.badge--safe    { background: var(--status-safe-glow);    color: var(--status-safe); }
+.badge--caution { background: var(--status-caution-glow); color: var(--status-caution); }
+.badge--risk    { background: var(--status-risk-glow);    color: var(--status-risk); }
+
+/* ─────────────────────────────────────────────
+   PURITY RING (Apple Watch–style)
+   Source: 6_STYLE_GUIDE.md §4
+───────────────────────────────────────────── */
+.purity-ring {
+  --pct: 82;
+  --ring-color: var(--status-safe);
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(var(--ring-color) calc(var(--pct) * 1%), var(--bg-surface-elevated) 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 0 12px var(--status-safe-glow));
+  animation: ring-fill 1s ease-out;
+  position: relative;
+}
+.purity-ring::before {
+  content: '';
+  width: 88%;
+  height: 88%;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  position: absolute;
+}
+
+/* ─────────────────────────────────────────────
+   THRESHOLD BAR
+   Source: 6_STYLE_GUIDE.md §4
+───────────────────────────────────────────── */
+.threshold-bar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface-elevated);
+  overflow: hidden;
+}
+.threshold-bar__fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.6s ease;
+}
+.threshold-bar__fill--safe    { background: linear-gradient(90deg, var(--status-safe), #4ADE80); }
+.threshold-bar__fill--caution { background: linear-gradient(90deg, var(--status-caution), #FBBF24); }
+.threshold-bar__fill--risk    { background: linear-gradient(90deg, var(--status-risk), #F87171); }
+
+/* ─────────────────────────────────────────────
+   LIVE PULSE INDICATOR
+   Source: 6_STYLE_GUIDE.md §4
+   Use on: map pins, bell dot, footer "Telemetry Network Live"
+───────────────────────────────────────────── */
+.pulse-dot {
+  position: relative;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--status-safe);
+  flex-shrink: 0;
+}
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid var(--status-safe);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* ─────────────────────────────────────────────
+   PRIMARY BUTTON
+   Source: 6_STYLE_GUIDE.md §4
+───────────────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-blue-light), var(--accent-blue));
+  color: white;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 14px 24px;
+  box-shadow: 0 4px 20px var(--accent-blue-glow);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+.btn-primary:hover {
+  box-shadow: 0 6px 28px var(--accent-blue-glow);
+  transform: translateY(-1px);
+}
+
+/* ─────────────────────────────────────────────
+   HEADER / NAV BAR
+   Source: 6_STYLE_GUIDE.md §4
+───────────────────────────────────────────── */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(11, 15, 23, 0.75);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 16px 32px;
+}
+
+[data-theme="light"] .app-header {
+  background: rgba(247, 249, 252, 0.85);
+}
+
+.app-header__nav a,
+.app-header__nav button {
+  position: relative;
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding-bottom: 6px;
+  transition: color 0.2s ease;
+}
+.app-header__nav a.active,
+.app-header__nav button.active {
+  color: var(--text-primary);
+}
+.app-header__nav a.active::after,
+.app-header__nav button.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent-blue-light);
+  animation: underline-grow 0.25s ease-out;
+}
+
+/* ─────────────────────────────────────────────
+   SKELETON SHIMMER (loading state)
+   Source: 6_STYLE_GUIDE.md §5
+───────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-surface-elevated) 25%,
+    rgba(255, 255, 255, 0.06) 50%,
+    var(--bg-surface-elevated) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+/* ─────────────────────────────────────────────
+   KEYFRAMES
+   Source: 6_STYLE_GUIDE.md §1, §4, §5
+───────────────────────────────────────────── */
+@keyframes logo-pop-in {
+  0%   { opacity: 0; transform: scale(0.7); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.6); opacity: 0.8; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes underline-grow {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+
+@keyframes ring-fill {
+  from { --pct: 0; }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0;  transform: scale(0.85); }
+  60%  { opacity: 1;  transform: scale(1.03); }
+  100% { opacity: 1;  transform: scale(1); }
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.85; transform: scale(0.98); }
+}
+
+/* ─────────────────────────────────────────────
+   ANIMATION UTILITIES
+───────────────────────────────────────────── */
+.animate-pop-in   { animation: popIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-pulse-slow { animation: pulseSlow 3s ease-in-out infinite; }
+
+/* ─────────────────────────────────────────────
+   REDUCED MOTION GUARD
+   Source: 6_STYLE_GUIDE.md §5
+───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .river-logo--hero,
+  .pulse-dot::after,
+  .purity-ring,
+  .skeleton,
+  .animate-pop-in,
+  .animate-pulse-slow {
+    animation: none !important;
+  }
+  .threshold-bar__fill {
+    transition: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   MATERIAL SYMBOLS
+───────────────────────────────────────────── */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  line-height: 1;
+}
+.material-symbols-outlined.fill-icon {
+  font-variation-settings: 'FILL' 1;
+}
+
+/* ─────────────────────────────────────────────
+   GLASSMORPHIC CARDS (legacy — keep for compat)
+───────────────────────────────────────────── */
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.04);
+}
+.dark .glass-card {
+  background: rgba(24, 27, 37, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+}
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+.dark .glass-panel {
+  background: rgba(28, 31, 41, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bg-gradient-brand {
+  background: linear-gradient(135deg, #f2f3fb 0%, #e1e2ea 100%);
+}
+.dark .bg-gradient-brand {
+  background: linear-gradient(135deg, #0f131c 0%, #1c1f29 100%);
+}
+
+/* ─────────────────────────────────────────────
+   CUSTOM SCROLLBAR
+───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(113, 119, 131, 0.3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(113, 119, 131, 0.5); }

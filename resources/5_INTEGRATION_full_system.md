@@ -93,8 +93,11 @@ How Hardware, Backend, Blockchain, and Frontend fit together end-to-end.
 
 ## File index
 
-- `1_FRONTEND_architecture_and_prompts.md` — Flutter/Stitch screens
+- `1_FRONTEND_architecture.md` — web app architecture, pages, state, branding
+- `1b_STITCH_WEB_DESIGN_PROMPTS.md` — standalone Google Stitch prompts (web)
 - `2_BACKEND_architecture_and_prompts.md` — FastAPI, schema, API surface
 - `3_BLOCKCHAIN_architecture_and_prompts.md` — hash-chain ledger + Amoy anchoring
 - `4_HARDWARE_architecture_and_prompts.md` — buoy build + firmware
 - `5_INTEGRATION_full_system.md` — this file
+
+Note: the app is now a **web app** (React/Next.js-style, responsive), not a Flutter mobile app — the frontend files above reflect that. Backend, blockchain, and hardware are unaffected by this change.

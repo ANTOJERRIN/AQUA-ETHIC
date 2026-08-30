@@ -20,3 +20,8 @@ Thumbs.db
 dist/
 build/
 *.log
+
+
+node_modules/
+.env
+backend/.env

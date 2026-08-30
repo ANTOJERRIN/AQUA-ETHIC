@@ -56,14 +56,29 @@ function getContract() {
 
 // ✅ FIX: Deterministic hash generation
 function generateRecordHash(sensorData) {
-    // Create deterministic JSON with sorted keys
+    // Create deterministic JSON with recursively sorted keys
     const dataToHash = {
         id: sensorData.id,
         sourceType: sensorData.sourceType || "IOT",
         data: sensorData.data || sensorData
     };
+
+    const sortKeysRecursively = (value) => {
+        if (Array.isArray(value)) {
+            return value.map(sortKeysRecursively);
+        }
+        if (value && typeof value === "object") {
+            return Object.keys(value)
+                .sort()
+                .reduce((sorted, key) => {
+                    sorted[key] = sortKeysRecursively(value[key]);
+                    return sorted;
+                }, {});
+        }
+        return value;
+    };
     
-    const canonicalData = JSON.stringify(dataToHash, Object.keys(dataToHash).sort());
+    const canonicalData = JSON.stringify(sortKeysRecursively(dataToHash));
     const hash = crypto.createHash("sha256").update(canonicalData).digest("hex");
     return "0x" + hash;
 }

@@ -1,29 +1,26 @@
 {
-  "name": "blockchain-sandbox",
+  "name": "aqua-ethic-blockchain",
   "version": "1.0.0",
-  "description": "",
+  "description": "Blockchain data integrity layer for AQUA-ETHIC water quality monitoring",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "deploy": "npx hardhat run scripts/deploy.js --network localhost",
+    "deploy:sepolia": "npx hardhat run scripts/deploy.js --network sepolia",
+    "compile": "npx hardhat compile",
+    "clean": "npx hardhat clean",
+    "node": "npx hardhat node",
+    "test": "npx hardhat test",
+    "demo": "node terminalDemo.js help"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/thulasiramegowda/blockchain-sandbox.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["blockchain", "ethereum", "hardhat", "water-quality", "aqua-ethic"],
+  "author": "AQUA-ETHIC Team",
+  "license": "MIT",
   "type": "module",
-  "bugs": {
-    "url": "https://github.com/thulasiramegowda/blockchain-sandbox/issues"
-  },
-  "homepage": "https://github.com/thulasiramegowda/blockchain-sandbox#readme",
-  "dependencies": {
-    "dotenv": "^17.4.2",
-    "ethers": "^6.17.0",
-    "express": "^5.2.1"
-  },
   "devDependencies": {
-    "hardhat": "^3.14.0"
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "hardhat": "^2.22.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
   }
 }

@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import LocationPage from './pages/LocationPage';
 import PurityPage from './pages/PurityPage';
 import AccountPage from './pages/AccountPage';
+import RiverBackdrop from './components/RiverBackdrop';
 import { LOCATIONS } from './data/mockData';
 
 export default function App() {
@@ -15,6 +16,19 @@ export default function App() {
   const [currentRoute, setCurrentRoute] = useState('location'); // 'location', 'purity', 'account'
   const [selectedLocation, setSelectedLocation] = useState(LOCATIONS[0]); // default: Ganga Kanpur
   const [darkMode, setDarkMode] = useState(false);
+
+  // Background Configuration (Porsche Luxury Look)
+  const [backdropConfig] = useState({
+    imageSrc: '/Gemini_Generated_Image_bi1jc5bi1jc5bi1j.jpg',
+    fitMode: 'ambient-hero',
+    opacity: 22,
+    blur: 0,
+    scale: 100,
+    blendMode: 'normal',
+    glowIntensity: 45,
+    inverted: false,
+    showNoise: true,
+  });
 
   // Sync Dark Theme class to HTML root
   useEffect(() => {
@@ -67,13 +81,21 @@ export default function App() {
 
   // 2. Unauthenticated Login Screen
   if (!isAuthenticated) {
-    return <LoginPage onLoginSuccess={handleLogin} />;
+    return (
+      <div className="relative min-h-screen">
+        <RiverBackdrop config={backdropConfig} darkMode={darkMode} />
+        <LoginPage onLoginSuccess={handleLogin} />
+      </div>
+    );
   }
 
   // 3. Authenticated Web Application Layout
   return (
-    <div className="min-h-screen flex flex-col bg-surface-bg dark:bg-dark-bg text-on-surface dark:text-gray-100 transition-colors duration-300">
+    <div className="min-h-screen relative flex flex-col bg-surface-bg/85 dark:bg-dark-bg/90 text-on-surface dark:text-gray-100 transition-colors duration-300">
       
+      {/* Porsche Luxury Ambient Background Image Layer */}
+      <RiverBackdrop config={backdropConfig} darkMode={darkMode} />
+
       {/* Top Navigation Bar */}
       <Header
         currentRoute={currentRoute}
@@ -83,7 +105,7 @@ export default function App() {
       />
 
       {/* Main Content View Port (with Top Spacing for Fixed Header) */}
-      <div className="flex-grow pt-20 flex flex-col">
+      <div className="flex-grow pt-20 flex flex-col relative z-10">
         {currentRoute === 'location' && (
           <LocationPage
             selectedLocation={selectedLocation}
@@ -116,3 +138,5 @@ export default function App() {
     </div>
   );
 }
+
+

@@ -1,0 +1,22 @@
+# Environment variables (contains passwords)
+.env
+
+# Node.js dependencies (huge folder)
+node_modules/
+
+# Package lock files
+package-lock.json
+yarn.lock
+
+# OS junk files
+.DS_Store
+Thumbs.db
+
+# IDE folders
+.vscode/
+.idea/
+
+# Build outputs
+dist/
+build/
+*.log

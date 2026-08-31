@@ -1,52 +1,70 @@
-// ===== MOCK BLOCKCHAIN SERVICE =====
-// REPLACE WITH REAL IMPLEMENTATION WHEN BLOCKCHAIN TEAM PROVIDES
-
-const blockchainConfig = require('../config/blockchain');
+﻿const blockchainConfig = require("../config/blockchain");
 
 class BlockchainService {
-    constructor() {
-        this.isMock = true;
-        console.log('⚠️ Using MOCK BlockchainService');
+  constructor() {
+    this.web3 = blockchainConfig.web3;
+    this.contract = blockchainConfig.getContract();
+    this.account = blockchainConfig.account;
+    this.privateKey = blockchainConfig.privateKey;
+    this.isMock = false;
+    console.log("BlockchainService ready (REAL)");
+  }
+
+  async storeHash(deviceId, dataHash, timestamp) {
+    try {
+      console.log("Storing on REAL blockchain: " + dataHash);
+
+      const tx = await this.contract.methods.storeReading(
+        deviceId,
+        dataHash,
+        timestamp,
+      );
+      const gasEstimate = await tx.estimateGas({ from: this.account });
+      const gasPrice = await this.web3.eth.getGasPrice();
+
+      const signedTx = await this.web3.eth.accounts.signTransaction(
+        {
+          to: blockchainConfig.contractAddress,
+          data: tx.encodeABI(),
+          gas: gasEstimate,
+          gasPrice: gasPrice,
+          from: this.account,
+          nonce: await this.web3.eth.getTransactionCount(this.account),
+        },
+        this.privateKey,
+      );
+
+      const receipt = await this.web3.eth.sendSignedTransaction(
+        signedTx.rawTransaction,
+      );
+
+      console.log("Blockchain stored! TX: " + receipt.transactionHash);
+      return {
+        txHash: receipt.transactionHash,
+        blockNumber: Number(receipt.blockNumber), // Convert BigInt to Number
+      };
+    } catch (error) {
+      console.error("Blockchain error:", error.message);
+      return null;
     }
+  }
 
-    /**
-     * Store hash on blockchain (MOCK)
-     */
-    async storeHash(deviceId, dataHash, timestamp) {
-        console.log(`📝 [MOCK] Storing on blockchain:`);
-        console.log(`   Device: ${deviceId}`);
-        console.log(`   Hash: ${dataHash}`);
-        console.log(`   Timestamp: ${timestamp}`);
-
-        // Simulate delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Generate mock transaction hash
-        const mockTxHash = '0x' + Array.from({ length: 64 }, () =>
-            Math.floor(Math.random() * 16).toString(16)
-        ).join('');
-
-        return {
-            txHash: mockTxHash,
-            blockNumber: Math.floor(Math.random() * 1000000) + 1000000
-        };
+  async verifyHash(dataHash) {
+    try {
+      console.log("Verifying: " + dataHash);
+      const result = await this.contract.methods.verifyReading(dataHash).call();
+      return {
+        exists: result.exists,
+        verified: result.verified,
+        deviceId: result.deviceId,
+        timestamp: result.timestamp,
+        validator: result.validator,
+      };
+    } catch (error) {
+      console.error("Verification error:", error.message);
+      return { exists: false, verified: false };
     }
-
-    /**
-     * Verify hash on blockchain (MOCK)
-     */
-    async verifyHash(dataHash) {
-        console.log(`🔍 [MOCK] Verifying: ${dataHash}`);
-
-        await new Promise(resolve => setTimeout(resolve, 300));
-
-        return {
-            exists: true,
-            verified: true,
-            deviceId: 'AQUA-001',
-            timestamp: Math.floor(Date.now() / 1000)
-        };
-    }
+  }
 }
 
 module.exports = new BlockchainService();

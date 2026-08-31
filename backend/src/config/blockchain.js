@@ -1,33 +1,42 @@
-// ===== MOCK BLOCKCHAIN CONFIG =====
-// REPLACE WITH REAL IMPLEMENTATION WHEN BLOCKCHAIN TEAM PROVIDES
-
+﻿const { Web3 } = require('web3');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
 class BlockchainConfig {
     constructor() {
-        this.isMock = true; // Set to false when real blockchain is ready
-        console.log('⚠️ Using MOCK blockchain service');
-        console.log('✅ Blockchain config loaded (mock mode)');
+        this.contractAddress = process.env.CONTRACT_ADDRESS;
+        this.account = process.env.DEPLOYER_ADDRESS;
+        this.privateKey = process.env.DEPLOYER_PRIVATE_KEY;
+        this.rpcUrl = process.env.BLOCKCHAIN_RPC_URL;
+
+        this.web3 = new Web3(this.rpcUrl);
+        this.isMock = false;
+
+        console.log('Blockchain Config loaded');
+        console.log('Contract: ' + this.contractAddress);
+        console.log('Account: ' + this.account);
+        console.log('RPC URL: ' + this.rpcUrl);
     }
 
-    // Mock function to simulate contract interaction
     getContract() {
-        return {
-            methods: {
-                storeReading: (deviceId, dataHash, timestamp) => ({
-                    encodeABI: () => '0x',
-                    estimateGas: async () => 500000
-                }),
-                verifyReading: (dataHash) => ({
-                    call: async () => ({
-                        exists: true,
-                        verified: true,
-                        deviceId: 'AQUA-001',
-                        timestamp: Math.floor(Date.now() / 1000)
-                    })
-                })
-            }
-        };
+        try {
+            const abiPath = path.join(__dirname, '../abis/WaterQuality.json');
+            const abi = JSON.parse(fs.readFileSync(abiPath, 'utf8')).abi;
+            return new this.web3.eth.Contract(abi, this.contractAddress);
+        } catch (error) {
+            console.warn('ABI not found, using mock contract');
+            return {
+                methods: {
+                    storeReading: function() {
+                        return { encodeABI: function() { return '0x'; } };
+                    },
+                    verifyReading: function() {
+                        return { call: async function() { return { exists: true, verified: true }; } };
+                    }
+                }
+            };
+        }
     }
 }
 

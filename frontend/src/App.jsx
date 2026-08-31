@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import LoadingScreen from './components/LoadingScreen';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -9,6 +9,24 @@ import AccountPage from './pages/AccountPage';
 import RiverBackdrop from './components/RiverBackdrop';
 import { LOCATIONS } from './data/mockData';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+const getMetricValue = (value, fallbackValue) =>
+  value === undefined || value === null ? fallbackValue : value;
+
+const formatLastScanned = (timestamp) => {
+  if (!timestamp) return 'just now';
+  const time = new Date(timestamp).getTime();
+  if (Number.isNaN(time)) return 'just now';
+
+  const minutes = Math.max(0, Math.round((Date.now() - time) / 60000));
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes} mins ago`;
+
+  const hours = Math.round(minutes / 60);
+  return `${hours} hr${hours > 1 ? 's' : ''} ago`;
+};
+
 export default function App() {
   // App States
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
@@ -16,6 +34,7 @@ export default function App() {
   const [currentRoute, setCurrentRoute] = useState('location'); // 'location', 'purity', 'account'
   const [selectedLocation, setSelectedLocation] = useState(LOCATIONS[0]); // default: Ganga Kanpur
   const [darkMode, setDarkMode] = useState(false);
+  const [latestBuoyReadings, setLatestBuoyReadings] = useState({});
 
   // Background Configuration (Porsche Luxury Look)
   const [backdropConfig] = useState({
@@ -58,6 +77,77 @@ export default function App() {
       setCurrentRoute(hash);
     }
   }, []);
+
+  useEffect(() => {
+    if (!selectedLocation?.id) return;
+
+    const controller = new AbortController();
+    let isMounted = true;
+
+    const syncLatestReading = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/sensor-data/latest/${encodeURIComponent(selectedLocation.id)}`,
+          { signal: controller.signal }
+        );
+
+        if (!response.ok) return;
+
+        const payload = await response.json();
+        if (!isMounted || !payload?.reading) return;
+
+        setLatestBuoyReadings((prev) => ({
+          ...prev,
+          [selectedLocation.id]: payload.reading
+        }));
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.warn('Buoy API unavailable, continuing with mock data fallback.');
+        }
+      }
+    };
+
+    syncLatestReading();
+    const interval = setInterval(syncLatestReading, 30000);
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+      clearInterval(interval);
+    };
+  }, [selectedLocation?.id]);
+
+  const selectedLocationWithLiveData = useMemo(() => {
+    const reading = latestBuoyReadings[selectedLocation.id];
+    if (!reading) return selectedLocation;
+
+    return {
+      ...selectedLocation,
+      lastScanned: formatLastScanned(reading.timestamp),
+      metrics: {
+        ...selectedLocation.metrics,
+        ph: {
+          ...selectedLocation.metrics.ph,
+          value: getMetricValue(reading.pH, selectedLocation.metrics.ph.value)
+        },
+        temperature: {
+          ...selectedLocation.metrics.temperature,
+          value: getMetricValue(reading.temperature, selectedLocation.metrics.temperature.value)
+        },
+        turbidity: {
+          ...selectedLocation.metrics.turbidity,
+          value: getMetricValue(reading.turbidity, selectedLocation.metrics.turbidity.value)
+        },
+        dissolvedOxygen: {
+          ...selectedLocation.metrics.dissolvedOxygen,
+          value: getMetricValue(
+            reading.dissolvedOxygen ?? reading.dissolved_oxygen,
+            selectedLocation.metrics.dissolvedOxygen.value
+          )
+        }
+      }
+    };
+  }, [latestBuoyReadings, selectedLocation]);
 
   const handleNavigate = (route) => {
     setCurrentRoute(route);
@@ -108,7 +198,7 @@ export default function App() {
       <div className="flex-grow pt-20 flex flex-col relative z-10">
         {currentRoute === 'location' && (
           <LocationPage
-            selectedLocation={selectedLocation}
+            selectedLocation={selectedLocationWithLiveData}
             setSelectedLocation={setSelectedLocation}
             setCurrentRoute={handleNavigate}
           />
@@ -116,7 +206,7 @@ export default function App() {
 
         {currentRoute === 'purity' && (
           <PurityPage
-            selectedLocation={selectedLocation}
+            selectedLocation={selectedLocationWithLiveData}
             setSelectedLocation={setSelectedLocation}
           />
         )}
@@ -138,5 +228,4 @@ export default function App() {
     </div>
   );
 }
-
 

@@ -1,6 +1,13 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const router = express.Router();
 const sensorController = require('../controllers/sensorController');
+const verifyRateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false
+});
 
 // POST: Receive data from ESP32 buoy
 router.post('/data', sensorController.receiveData);
@@ -12,6 +19,6 @@ router.get('/latest/:deviceId', sensorController.getLatest);
 router.get('/history/:deviceId', sensorController.getHistory);
 
 // GET: Verify a reading by its hash
-router.get('/verify/:dataHash', sensorController.verifyReading);
+router.get('/verify/:dataHash', verifyRateLimiter, sensorController.verifyReading);
 
 module.exports = router;

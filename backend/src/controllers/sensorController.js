@@ -79,7 +79,7 @@ class SensorController {
   }
 
   /**
-   * GET /api/latest/:deviceId
+   * GET /api/sensor-data/latest/:deviceId
    * Get latest reading for a device
    */
   async getLatest(req, res) {
@@ -107,7 +107,7 @@ class SensorController {
   }
 
   /**
-   * GET /api/history/:deviceId
+   * GET /api/sensor-data/history/:deviceId
    * Get historical readings for a device
    */
   async getHistory(req, res) {
@@ -136,7 +136,7 @@ class SensorController {
   }
 
   /**
-   * GET /api/verify/:dataHash
+   * GET /api/sensor-data/verify/:dataHash
    * Verify a reading by its hash
    */
   async verifyReading(req, res) {

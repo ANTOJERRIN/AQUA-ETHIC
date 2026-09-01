@@ -53,7 +53,6 @@ async function startServer() {
         app.listen(PORT, () => {
             console.log(`🚀 Server running on http://localhost:${PORT}`);
             console.log(`📡 API Base URL: http://localhost:${PORT}/api/sensor-data`);
-            console.log(`⛓️ Blockchain service: MOCK mode`);
         });
 
     } catch (error) {

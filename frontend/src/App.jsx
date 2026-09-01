@@ -9,10 +9,10 @@ import AccountPage from './pages/AccountPage';
 import RiverBackdrop from './components/RiverBackdrop';
 import { LOCATIONS } from './data/mockData';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000').replace(/\/$/, '');
 
-const getMetricValue = (value, fallbackValue) =>
-  value === undefined || value === null ? fallbackValue : value;
+const getReadingValue = (reading, key, fallbackValue) =>
+  reading?.[key] ?? reading?.[key.toLowerCase()] ?? fallbackValue;
 
 const formatLastScanned = (timestamp) => {
   if (!timestamp) return 'just now';
@@ -28,15 +28,13 @@ const formatLastScanned = (timestamp) => {
 };
 
 export default function App() {
-  // App States
   const [isLoadingInitial, setIsLoadingInitial] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(true); // default logged in for seamless demo review
-  const [currentRoute, setCurrentRoute] = useState('location'); // 'location', 'purity', 'account'
-  const [selectedLocation, setSelectedLocation] = useState(LOCATIONS[0]); // default: Ganga Kanpur
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [currentRoute, setCurrentRoute] = useState('location');
+  const [selectedLocation, setSelectedLocation] = useState(LOCATIONS[0]);
   const [darkMode, setDarkMode] = useState(false);
   const [latestBuoyReadings, setLatestBuoyReadings] = useState({});
 
-  // Background Configuration (Porsche Luxury Look)
   const [backdropConfig] = useState({
     imageSrc: '/Gemini_Generated_Image_bi1jc5bi1jc5bi1j.jpg',
     fitMode: 'ambient-hero',
@@ -49,7 +47,6 @@ export default function App() {
     showNoise: true,
   });
 
-  // Sync Dark Theme class to HTML root
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -62,7 +59,6 @@ export default function App() {
     }
   }, [darkMode]);
 
-  // Initial Loading Screen Pop-In (2 seconds on fresh load)
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoadingInitial(false);
@@ -70,7 +66,6 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle URL hash routing if present
   useEffect(() => {
     const hash = window.location.hash.replace('#/', '').replace('#', '');
     if (['location', 'purity', 'account'].includes(hash)) {
@@ -128,20 +123,21 @@ export default function App() {
         ...selectedLocation.metrics,
         ph: {
           ...selectedLocation.metrics.ph,
-          value: getMetricValue(reading.pH, selectedLocation.metrics.ph.value)
+          value: getReadingValue(reading, 'pH', selectedLocation.metrics.ph.value)
         },
         temperature: {
           ...selectedLocation.metrics.temperature,
-          value: getMetricValue(reading.temperature, selectedLocation.metrics.temperature.value)
+          value: getReadingValue(reading, 'temperature', selectedLocation.metrics.temperature.value)
         },
         turbidity: {
           ...selectedLocation.metrics.turbidity,
-          value: getMetricValue(reading.turbidity, selectedLocation.metrics.turbidity.value)
+          value: getReadingValue(reading, 'turbidity', selectedLocation.metrics.turbidity.value)
         },
         dissolvedOxygen: {
           ...selectedLocation.metrics.dissolvedOxygen,
-          value: getMetricValue(
-            reading.dissolvedOxygen ?? reading.dissolved_oxygen,
+          value: getReadingValue(
+            { ...reading, dissolvedOxygen: reading?.dissolvedOxygen ?? reading?.dissolved_oxygen },
+            'dissolvedOxygen',
             selectedLocation.metrics.dissolvedOxygen.value
           )
         }
@@ -164,12 +160,10 @@ export default function App() {
     setIsAuthenticated(false);
   };
 
-  // 1. Initial Loading Screen
   if (isLoadingInitial) {
     return <LoadingScreen onLoaded={() => setIsLoadingInitial(false)} />;
   }
 
-  // 2. Unauthenticated Login Screen
   if (!isAuthenticated) {
     return (
       <div className="relative min-h-screen">
@@ -179,14 +173,10 @@ export default function App() {
     );
   }
 
-  // 3. Authenticated Web Application Layout
   return (
     <div className="min-h-screen relative flex flex-col bg-surface-bg/85 dark:bg-dark-bg/90 text-on-surface dark:text-gray-100 transition-colors duration-300">
-      
-      {/* Porsche Luxury Ambient Background Image Layer */}
       <RiverBackdrop config={backdropConfig} darkMode={darkMode} />
 
-      {/* Top Navigation Bar */}
       <Header
         currentRoute={currentRoute}
         setCurrentRoute={handleNavigate}
@@ -194,7 +184,6 @@ export default function App() {
         setDarkMode={setDarkMode}
       />
 
-      {/* Main Content View Port (with Top Spacing for Fixed Header) */}
       <div className="flex-grow pt-20 flex flex-col relative z-10">
         {currentRoute === 'location' && (
           <LocationPage
@@ -222,10 +211,7 @@ export default function App() {
         )}
       </div>
 
-      {/* Footer */}
       <Footer setCurrentRoute={handleNavigate} />
-
     </div>
   );
 }
-

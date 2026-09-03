@@ -2,6 +2,7 @@
 export const LOCATIONS = [
   {
     id: "ganga-kanpur",
+    deviceId: "ganga-kanpur",
     name: "Ganga River",
     stretch: "Kanpur Stretch",
     district: "Uttar Pradesh",
@@ -29,6 +30,7 @@ export const LOCATIONS = [
   },
   {
     id: "arkavathi-bengaluru",
+    deviceId: "arkavathi-bengaluru",
     name: "Arkavathi Lake",
     stretch: "Bengaluru Reservoir Stretch",
     district: "Karnataka",
@@ -56,6 +58,7 @@ export const LOCATIONS = [
   },
   {
     id: "colorado-alpha",
+    deviceId: "colorado-alpha",
     name: "Colorado River",
     stretch: "Station Alpha - Basin 4",
     district: "Utah / Arizona Border",
@@ -83,6 +86,7 @@ export const LOCATIONS = [
   },
   {
     id: "mississippi-delta",
+    deviceId: "mississippi-delta",
     name: "Mississippi River",
     stretch: "Delta Point Sector 9",
     district: "Louisiana Coast",
@@ -110,6 +114,7 @@ export const LOCATIONS = [
   },
   {
     id: "thames-central",
+    deviceId: "thames-central",
     name: "Thames River",
     stretch: "London Central Reach",
     district: "Greater London",
@@ -135,32 +140,33 @@ export const LOCATIONS = [
       resolution: "10m Ground Resolution"
     }
   },
-  // ===== 🟢 NEW: LIVE BUOY LOCATION =====
+  // ===== 🟢 LIVE BUOY LOCATION =====
   {
     id: "live-buoy-aqua-001",
+    deviceId: "AQUA-001",
     name: "Live Buoy",
     stretch: "AQUA-001 — Real-time Telemetry",
     district: "IoT Monitoring Station",
-    coordinates: [0, 0],
-    purityScore: 0,
+    coordinates: [26.4499, 80.3319],
+    purityScore: 88,
     status: "safe",
-    lastScanned: "Waiting for data...",
+    lastScanned: "Live continuous",
     anomaly_flag: false,
     anomalyMessage: null,
-    isLive: true, // ← Special flag for IoT buoy
+    isLive: true,
     metrics: {
-      ph: { value: 0, unit: "pH", status: "safe", trend: "live", baseline: 7 },
-      temperature: { value: 0, unit: "°C", status: "safe", trend: "live", baseline: 25 },
-      turbidity: { value: 0, unit: "NTU", status: "safe", trend: "live", baseline: 2 },
-      dissolvedOxygen: { value: 0, unit: "mg/L", status: "safe", trend: "live", baseline: 6 },
-      conductivity: { value: 0, unit: "µS/cm", status: "safe", trend: "live", baseline: 400 }
+      ph: { value: 7.4, unit: "pH", status: "safe", trend: "live", baseline: 7.4 },
+      temperature: { value: 24.5, unit: "°C", status: "safe", trend: "live", baseline: 25.0 },
+      turbidity: { value: 3.2, unit: "NTU", status: "safe", trend: "live", baseline: 3.0 },
+      dissolvedOxygen: { value: 7.2, unit: "mg/L", status: "safe", trend: "live", baseline: 7.0 },
+      conductivity: { value: 380, unit: "µS/cm", status: "safe", trend: "live", baseline: 400 }
     },
     remoteSensing: {
-      ndti: 0,
-      ndci: 0,
-      turbidityIndex: "Live Data",
-      algalBloomRisk: "Real-time",
-      satelliteSource: "IoT Buoy",
+      ndti: 0.05,
+      ndci: 0.03,
+      turbidityIndex: "Live Hydro Sensor",
+      algalBloomRisk: "Low Risk",
+      satelliteSource: "IoT Buoy Telemetry",
       resolution: "Live Telemetry"
     }
   }

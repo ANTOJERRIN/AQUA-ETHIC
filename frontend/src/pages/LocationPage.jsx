@@ -15,7 +15,8 @@ import {
   Plus,
   Minus,
   Sparkles,
-  Layers
+  Layers,
+  ShieldCheck
 } from 'lucide-react';
 import { LOCATIONS } from '../data/mockData';
 

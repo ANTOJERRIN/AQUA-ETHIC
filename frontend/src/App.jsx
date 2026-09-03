@@ -78,11 +78,12 @@ export default function App() {
 
     const controller = new AbortController();
     let isMounted = true;
+    const targetDeviceId = selectedLocation.deviceId || selectedLocation.id;
 
     const syncLatestReading = async () => {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/sensor-data/latest/${encodeURIComponent(selectedLocation.id)}`,
+          `${API_BASE_URL}/api/sensor-data/latest/${encodeURIComponent(targetDeviceId)}`,
           { signal: controller.signal }
         );
 
@@ -93,7 +94,8 @@ export default function App() {
 
         setLatestBuoyReadings((prev) => ({
           ...prev,
-          [selectedLocation.id]: payload.reading
+          [selectedLocation.id]: payload.reading,
+          [targetDeviceId]: payload.reading
         }));
       } catch (error) {
         if (error.name !== 'AbortError') {
@@ -103,43 +105,63 @@ export default function App() {
     };
 
     syncLatestReading();
-    const interval = setInterval(syncLatestReading, 30000);
+    const interval = setInterval(syncLatestReading, 15000); // 15s refresh for live feel
 
     return () => {
       isMounted = false;
       controller.abort();
       clearInterval(interval);
     };
-  }, [selectedLocation?.id]);
+  }, [selectedLocation?.id, selectedLocation?.deviceId]);
 
   const selectedLocationWithLiveData = useMemo(() => {
-    const reading = latestBuoyReadings[selectedLocation.id];
+    const targetDeviceId = selectedLocation.deviceId || selectedLocation.id;
+    const reading = latestBuoyReadings[selectedLocation.id] || latestBuoyReadings[targetDeviceId];
     if (!reading) return selectedLocation;
+
+    const phVal = Number(getReadingValue(reading, 'pH', selectedLocation.metrics.ph.value));
+    const tempVal = Number(getReadingValue(reading, 'temperature', selectedLocation.metrics.temperature.value));
+    const turbVal = Number(getReadingValue(reading, 'turbidity', selectedLocation.metrics.turbidity.value));
+    const doVal = Number(getReadingValue(
+      { ...reading, dissolvedOxygen: reading?.dissolvedOxygen ?? reading?.dissolved_oxygen },
+      'dissolvedOxygen',
+      selectedLocation.metrics.dissolvedOxygen.value
+    ));
+
+    // Dynamic purity calculation for live buoy
+    let liveScore = selectedLocation.purityScore;
+    if (selectedLocation.isLive) {
+      liveScore = 100;
+      if (phVal < 6.5 || phVal > 8.5) liveScore -= 20;
+      if (turbVal > 10) liveScore -= 20;
+      else if (turbVal > 5) liveScore -= 10;
+      if (doVal < 5) liveScore -= 20;
+      liveScore = Math.max(20, Math.min(100, liveScore));
+    }
 
     return {
       ...selectedLocation,
+      purityScore: liveScore,
       lastScanned: formatLastScanned(reading.timestamp),
       metrics: {
         ...selectedLocation.metrics,
         ph: {
           ...selectedLocation.metrics.ph,
-          value: getReadingValue(reading, 'pH', selectedLocation.metrics.ph.value)
+          value: phVal
         },
         temperature: {
           ...selectedLocation.metrics.temperature,
-          value: getReadingValue(reading, 'temperature', selectedLocation.metrics.temperature.value)
+          value: tempVal
         },
         turbidity: {
           ...selectedLocation.metrics.turbidity,
-          value: getReadingValue(reading, 'turbidity', selectedLocation.metrics.turbidity.value)
+          value: turbVal,
+          status: turbVal <= 5 ? 'safe' : turbVal <= 25 ? 'caution' : 'risk'
         },
         dissolvedOxygen: {
           ...selectedLocation.metrics.dissolvedOxygen,
-          value: getReadingValue(
-            { ...reading, dissolvedOxygen: reading?.dissolvedOxygen ?? reading?.dissolved_oxygen },
-            'dissolvedOxygen',
-            selectedLocation.metrics.dissolvedOxygen.value
-          )
+          value: doVal,
+          status: doVal >= 5 ? 'safe' : 'risk'
         }
       }
     };

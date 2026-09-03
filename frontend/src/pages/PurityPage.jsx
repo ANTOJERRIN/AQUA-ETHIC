@@ -40,25 +40,29 @@ export default function PurityPage({ selectedLocation, setSelectedLocation }) {
 
   // Fetch IoT data when toggle is switched to 'iot' OR when it's a live location
   useEffect(() => {
-    if (dataSource === 'iot') {
+    if (dataSource === 'iot' || isLiveLocation) {
       fetchIoTData();
+      const interval = setInterval(fetchIoTData, 15000); // 15s live refresh
+      return () => clearInterval(interval);
     }
-  }, [dataSource, timeRange]);
+  }, [dataSource, timeRange, isLiveLocation, selectedLocation?.id, selectedLocation?.deviceId]);
 
   const fetchIoTData = async () => {
     setIotLoading(true);
     setIotError(null);
+    const targetDevId = selectedLocation?.deviceId || selectedLocation?.id || 'AQUA-001';
     try {
       const [latestRes, historyRes] = await Promise.all([
-        getIoTData('AQUA-001'),
-        getIoTHistory('AQUA-001', timeRange === '24h' ? 24 : timeRange === '7d' ? 7 : 30)
+        getIoTData(targetDevId),
+        getIoTHistory(targetDevId, timeRange === '24h' ? 24 : timeRange === '7d' ? 7 : 30)
       ]);
       
       if (latestRes.status === 'success' && latestRes.reading) {
         setIotData(latestRes.reading);
       }
-      if (historyRes.status === 'success') {
-        setIotHistory(historyRes.readings);
+      if (historyRes.status === 'success' && Array.isArray(historyRes.readings)) {
+        // Reverse so historical array flows from oldest to newest
+        setIotHistory([...historyRes.readings].reverse());
       }
     } catch (error) {
       setIotError('Failed to fetch IoT data. Make sure the backend is running.');
@@ -88,12 +92,12 @@ export default function PurityPage({ selectedLocation, setSelectedLocation }) {
     }
     
     return history.map(reading => ({
-      time: new Date(reading.timestamp).toLocaleTimeString(),
-      turbidity: reading.turbidity ?? reading.turb ?? 0,
-      ph: reading.pH ?? reading.ph ?? 7.0,
-      temperature: reading.temperature ?? reading.temp ?? 25,
-      dissolvedOxygen: reading.dissolved_oxygen ?? reading.dissolvedOxygen ?? 
-                       Math.max(0, 14.6 - ((reading.temperature ?? 25) * 0.25))
+      time: new Date(reading.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      turbidity: Number(reading.turbidity ?? reading.turb ?? 0),
+      ph: Number(reading.pH ?? reading.ph ?? 7.0),
+      temperature: Number(reading.temperature ?? reading.temp ?? 25),
+      dissolvedOxygen: Number(reading.dissolved_oxygen ?? reading.dissolvedOxygen ?? 
+                       Math.max(0, 14.6 - ((reading.temperature ?? 25) * 0.25)))
     }));
   };
 

@@ -1,4 +1,3 @@
-// Comprehensive mock dataset for River Water Quality Monitoring Platform
 
 export const LOCATIONS = [
   {
@@ -8,7 +7,7 @@ export const LOCATIONS = [
     district: "Uttar Pradesh",
     coordinates: [26.4499, 80.3319],
     purityScore: 82,
-    status: "safe", // safe, caution, risk
+    status: "safe",
     lastScanned: "10 mins ago",
     anomaly_flag: false,
     anomalyMessage: "Mild turbidity elevation observed near industrial outlet zone over the last 2 hours.",
@@ -20,8 +19,8 @@ export const LOCATIONS = [
       conductivity: { value: 380, unit: "µS/cm", status: "safe", trend: "stable", baseline: 400 }
     },
     remoteSensing: {
-      ndti: 0.18, // Normalized Difference Turbidity Index
-      ndci: 0.09, // Normalized Difference Chlorophyll Index
+      ndti: 0.18,
+      ndci: 0.09,
       turbidityIndex: "Low-Moderate",
       algalBloomRisk: "Low",
       satelliteSource: "Sentinel-2 MSI",
@@ -135,47 +134,76 @@ export const LOCATIONS = [
       satelliteSource: "Sentinel-2 MSI",
       resolution: "10m Ground Resolution"
     }
+  },
+  // ===== 🟢 NEW: LIVE BUOY LOCATION =====
+  {
+    id: "live-buoy-aqua-001",
+    name: "Live Buoy",
+    stretch: "AQUA-001 — Real-time Telemetry",
+    district: "IoT Monitoring Station",
+    coordinates: [0, 0],
+    purityScore: 0,
+    status: "safe",
+    lastScanned: "Waiting for data...",
+    anomaly_flag: false,
+    anomalyMessage: null,
+    isLive: true, // ← Special flag for IoT buoy
+    metrics: {
+      ph: { value: 0, unit: "pH", status: "safe", trend: "live", baseline: 7 },
+      temperature: { value: 0, unit: "°C", status: "safe", trend: "live", baseline: 25 },
+      turbidity: { value: 0, unit: "NTU", status: "safe", trend: "live", baseline: 2 },
+      dissolvedOxygen: { value: 0, unit: "mg/L", status: "safe", trend: "live", baseline: 6 },
+      conductivity: { value: 0, unit: "µS/cm", status: "safe", trend: "live", baseline: 400 }
+    },
+    remoteSensing: {
+      ndti: 0,
+      ndci: 0,
+      turbidityIndex: "Live Data",
+      algalBloomRisk: "Real-time",
+      satelliteSource: "IoT Buoy",
+      resolution: "Live Telemetry"
+    }
   }
 ];
 
-// Time series charts data generators
+// ===== TIME SERIES DATA GENERATORS =====
 export const getTimeSeriesData = (locationId, range = '24h', source = 'remote') => {
   const isArkavathi = locationId === 'arkavathi-bengaluru';
-  const baseTurbidity = isArkavathi ? 60 : 22;
-  const baseScore = isArkavathi ? 45 : 82;
+  const isLive = locationId === 'live-buoy-aqua-001';
+  const baseTurbidity = isArkavathi ? 60 : isLive ? 2 : 22;
+  const baseScore = isArkavathi ? 45 : isLive ? 0 : 82;
 
   if (range === '24h') {
     return [
-      { time: '00:00', ndti: 0.12, ndci: 0.05, ph: 7.5, turbidity: baseTurbidity - 3, dissolvedOxygen: 7.2, score: baseScore + 2 },
-      { time: '04:00', ndti: 0.14, ndci: 0.06, ph: 7.4, turbidity: baseTurbidity - 1, dissolvedOxygen: 7.0, score: baseScore + 1 },
-      { time: '08:00', ndti: 0.19, ndci: 0.08, ph: 7.6, turbidity: baseTurbidity + 4, dissolvedOxygen: 6.9, score: baseScore - 3 },
-      { time: '12:00', ndti: 0.24, ndci: 0.11, ph: 7.8, turbidity: baseTurbidity + 8, dissolvedOxygen: 6.5, score: baseScore - 6 },
-      { time: '16:00', ndti: 0.22, ndci: 0.10, ph: 7.7, turbidity: baseTurbidity + 6, dissolvedOxygen: 6.6, score: baseScore - 4 },
-      { time: '20:00', ndti: 0.18, ndci: 0.09, ph: 7.5, turbidity: baseTurbidity + 2, dissolvedOxygen: 6.8, score: baseScore - 1 },
+      { time: '00:00', ndti: 0.12, ndci: 0.05, ph: 7.5, turbidity: baseTurbidity - 0.5, dissolvedOxygen: 7.2, score: baseScore + 2 },
+      { time: '04:00', ndti: 0.14, ndci: 0.06, ph: 7.4, turbidity: baseTurbidity - 0.3, dissolvedOxygen: 7.0, score: baseScore + 1 },
+      { time: '08:00', ndti: 0.19, ndci: 0.08, ph: 7.6, turbidity: baseTurbidity + 0.8, dissolvedOxygen: 6.9, score: baseScore - 3 },
+      { time: '12:00', ndti: 0.24, ndci: 0.11, ph: 7.8, turbidity: baseTurbidity + 1.5, dissolvedOxygen: 6.5, score: baseScore - 6 },
+      { time: '16:00', ndti: 0.22, ndci: 0.10, ph: 7.7, turbidity: baseTurbidity + 1.0, dissolvedOxygen: 6.6, score: baseScore - 4 },
+      { time: '20:00', ndti: 0.18, ndci: 0.09, ph: 7.5, turbidity: baseTurbidity + 0.3, dissolvedOxygen: 6.8, score: baseScore - 1 },
       { time: 'Now', ndti: 0.18, ndci: 0.09, ph: 7.8, turbidity: baseTurbidity, dissolvedOxygen: 6.8, score: baseScore }
     ];
   } else if (range === '7d') {
     return [
-      { time: 'Mon', ndti: 0.14, ndci: 0.05, ph: 7.4, turbidity: baseTurbidity - 4, dissolvedOxygen: 7.4, score: baseScore + 4 },
-      { time: 'Tue', ndti: 0.15, ndci: 0.06, ph: 7.5, turbidity: baseTurbidity - 2, dissolvedOxygen: 7.1, score: baseScore + 2 },
-      { time: 'Wed', ndti: 0.18, ndci: 0.08, ph: 7.6, turbidity: baseTurbidity + 1, dissolvedOxygen: 6.9, score: baseScore },
-      { time: 'Thu', ndti: 0.26, ndci: 0.14, ph: 7.9, turbidity: baseTurbidity + 12, dissolvedOxygen: 6.2, score: baseScore - 8 },
-      { time: 'Fri', ndti: 0.22, ndci: 0.11, ph: 7.7, turbidity: baseTurbidity + 7, dissolvedOxygen: 6.5, score: baseScore - 5 },
-      { time: 'Sat', ndti: 0.19, ndci: 0.09, ph: 7.6, turbidity: baseTurbidity + 3, dissolvedOxygen: 6.7, score: baseScore - 2 },
+      { time: 'Mon', ndti: 0.14, ndci: 0.05, ph: 7.4, turbidity: baseTurbidity - 0.8, dissolvedOxygen: 7.4, score: baseScore + 4 },
+      { time: 'Tue', ndti: 0.15, ndci: 0.06, ph: 7.5, turbidity: baseTurbidity - 0.4, dissolvedOxygen: 7.1, score: baseScore + 2 },
+      { time: 'Wed', ndti: 0.18, ndci: 0.08, ph: 7.6, turbidity: baseTurbidity + 0.2, dissolvedOxygen: 6.9, score: baseScore },
+      { time: 'Thu', ndti: 0.26, ndci: 0.14, ph: 7.9, turbidity: baseTurbidity + 2.4, dissolvedOxygen: 6.2, score: baseScore - 8 },
+      { time: 'Fri', ndti: 0.22, ndci: 0.11, ph: 7.7, turbidity: baseTurbidity + 1.4, dissolvedOxygen: 6.5, score: baseScore - 5 },
+      { time: 'Sat', ndti: 0.19, ndci: 0.09, ph: 7.6, turbidity: baseTurbidity + 0.6, dissolvedOxygen: 6.7, score: baseScore - 2 },
       { time: 'Sun', ndti: 0.18, ndci: 0.09, ph: 7.8, turbidity: baseTurbidity, dissolvedOxygen: 6.8, score: baseScore }
     ];
   } else {
-    // 30d
     return [
-      { time: 'Week 1', ndti: 0.13, ndci: 0.05, ph: 7.4, turbidity: baseTurbidity - 5, dissolvedOxygen: 7.3, score: baseScore + 5 },
-      { time: 'Week 2', ndti: 0.17, ndci: 0.07, ph: 7.5, turbidity: baseTurbidity - 1, dissolvedOxygen: 7.0, score: baseScore + 1 },
-      { time: 'Week 3', ndti: 0.25, ndci: 0.13, ph: 7.8, turbidity: baseTurbidity + 9, dissolvedOxygen: 6.3, score: baseScore - 7 },
+      { time: 'Week 1', ndti: 0.13, ndci: 0.05, ph: 7.4, turbidity: baseTurbidity - 1.0, dissolvedOxygen: 7.3, score: baseScore + 5 },
+      { time: 'Week 2', ndti: 0.17, ndci: 0.07, ph: 7.5, turbidity: baseTurbidity - 0.2, dissolvedOxygen: 7.0, score: baseScore + 1 },
+      { time: 'Week 3', ndti: 0.25, ndci: 0.13, ph: 7.8, turbidity: baseTurbidity + 1.8, dissolvedOxygen: 6.3, score: baseScore - 7 },
       { time: 'Week 4', ndti: 0.18, ndci: 0.09, ph: 7.8, turbidity: baseTurbidity, dissolvedOxygen: 6.8, score: baseScore }
     ];
   }
 };
 
-// User Profile & Monitoring History
+// ===== USER PROFILE =====
 export const USER_PROFILE = {
   name: "Dr. Jane Doe",
   role: "Senior Hydrologist",

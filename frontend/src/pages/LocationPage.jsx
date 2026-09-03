@@ -22,7 +22,7 @@ import { LOCATIONS } from '../data/mockData';
 export default function LocationPage({ selectedLocation, setSelectedLocation, setCurrentRoute }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [mapZoom, setMapZoom] = useState(1);
-  const [mapLayer, setMapLayer] = useState('satellite'); // satellite, vector
+  const [mapLayer, setMapLayer] = useState('satellite');
   const [isLocating, setIsLocating] = useState(false);
 
   // Filter locations by search
@@ -36,6 +36,11 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
   const handleSelectLocation = (loc) => {
     setSelectedLocation(loc);
     setSearchQuery('');
+    
+    // ===== AUTO-NAVIGATE TO PURITY PAGE FOR LIVE BUOY =====
+    if (loc.isLive) {
+      setCurrentRoute('purity');
+    }
   };
 
   const handleGeolocation = () => {
@@ -44,7 +49,6 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           setIsLocating(false);
-          // Match closest or default to Ganga Kanpur
           setSelectedLocation(LOCATIONS[0]);
         },
         (err) => {
@@ -206,7 +210,7 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
                   <g 
                     key={loc.id} 
                     className="cursor-pointer transition-all duration-300"
-                    onClick={() => setSelectedLocation(loc)}
+                    onClick={() => handleSelectLocation(loc)}
                   >
                     {isCurrent && (
                       <circle
@@ -236,7 +240,7 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
                       fontWeight="bold"
                       className="drop-shadow-md select-none"
                     >
-                      {loc.name}
+                      {loc.isLive ? '🟢 Live Buoy' : loc.name}
                     </text>
                   </g>
                 );
@@ -255,13 +259,22 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
             }`} />
             <div>
               <p className="text-xs font-bold text-on-surface dark:text-white">
-                {selectedLocation.name} ({selectedLocation.stretch})
+                {selectedLocation.isLive ? '🟢 Live Buoy (AQUA-001)' : `${selectedLocation.name} (${selectedLocation.stretch})`}
               </p>
               <p className="text-[10px] text-on-surface-variant dark:text-gray-400">
-                Coords: {selectedLocation.coordinates[0]}°N, {selectedLocation.coordinates[1]}°E
+                {selectedLocation.isLive ? '📍 Real-time IoT Telemetry' : `Coords: ${selectedLocation.coordinates[0]}°N, ${selectedLocation.coordinates[1]}°E`}
               </p>
             </div>
           </div>
+
+          {/* Live Buoy Indicator on Map */}
+          {selectedLocation.isLive && (
+            <div className="absolute top-4 right-4 z-20">
+              <span className="bg-green-500/20 text-green-400 border border-green-500/30 text-xs px-3 py-1.5 rounded-full font-semibold backdrop-blur-md animate-pulse">
+                🟢 LIVE
+              </span>
+            </div>
+          )}
 
           {/* Floating Zoom & Layer Controls on Bottom-Right of Map */}
           <div className="absolute right-4 bottom-4 flex flex-col gap-2 z-10">
@@ -281,22 +294,43 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
             </button>
           </div>
 
-          {/* Quick Monitored Stretch Pills below map */}
+          {/* Quick Monitored Stretch Pills — INCLUDING LIVE BUOY */}
           <div className="absolute bottom-4 left-4 hidden sm:flex items-center gap-2 z-10">
             <span className="text-[11px] font-semibold text-white/80 uppercase tracking-wider bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-lg">
               Quick Pick:
             </span>
-            {LOCATIONS.slice(0, 3).map((loc) => (
+            {LOCATIONS.map((loc) => (
               <button
                 key={loc.id}
-                onClick={() => setSelectedLocation(loc)}
+                onClick={() => handleSelectLocation(loc)}
                 className={`text-xs px-3 py-1 rounded-lg font-semibold transition-all backdrop-blur-md ${
                   selectedLocation.id === loc.id
                     ? 'bg-primary text-white shadow-md'
-                    : 'bg-white/20 text-white hover:bg-white/30'
+                    : loc.isLive 
+                      ? 'bg-green-500/30 text-green-300 border border-green-500/50 hover:bg-green-500/40' 
+                      : 'bg-white/20 text-white hover:bg-white/30'
                 }`}
               >
-                {loc.name}
+                {loc.isLive ? '🟢 Live Buoy' : loc.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Mobile Quick Pick */}
+          <div className="absolute bottom-16 left-4 sm:hidden flex flex-wrap gap-1.5 z-10">
+            {LOCATIONS.slice(0, 4).map((loc) => (
+              <button
+                key={loc.id}
+                onClick={() => handleSelectLocation(loc)}
+                className={`text-[10px] px-2.5 py-1 rounded-lg font-semibold transition-all backdrop-blur-md ${
+                  selectedLocation.id === loc.id
+                    ? 'bg-primary text-white shadow-md'
+                    : loc.isLive 
+                      ? 'bg-green-500/30 text-green-300 border border-green-500/50' 
+                      : 'bg-white/20 text-white hover:bg-white/30'
+                }`}
+              >
+                {loc.isLive ? '🟢 Buoy' : loc.name.split(' ')[0]}
               </button>
             ))}
           </div>
@@ -304,7 +338,7 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
         </div>
       </section>
 
-      {/* RIGHT PANEL: Data Details & Live Assessment (40% width on Desktop) */}
+      {/* RIGHT PANEL: Data Details & Live Assessment */}
       <aside className="w-full md:w-2/5 flex flex-col">
         <div className="glass-card dark:bg-dark-surface rounded-2xl p-6 md:p-7 border border-border-subtle dark:border-dark-border shadow-[0_4px_24px_rgba(0,0,0,0.04)] h-full flex flex-col gap-6 relative overflow-hidden transition-colors">
           
@@ -317,15 +351,23 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
               : 'bg-risk-red/10'
           }`} />
 
+          {/* Live Buoy Badge in Right Panel */}
+          {selectedLocation.isLive && (
+            <div className="relative z-10 bg-green-500/10 border border-green-500/30 rounded-xl p-2.5 flex items-center gap-2 animate-pulse">
+              <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span>
+              <span className="text-xs font-semibold text-green-400">🟢 Live Telemetry from ESP32</span>
+            </div>
+          )}
+
           {/* Header Info */}
           <div className="flex flex-col gap-2 relative z-10">
             <div className="flex justify-between items-start">
               <div>
                 <h2 className="font-bold text-2xl md:text-3xl text-on-surface dark:text-white tracking-tight">
-                  {selectedLocation.name}
+                  {selectedLocation.isLive ? '🟢 Live Buoy' : selectedLocation.name}
                 </h2>
                 <p className="font-medium text-base text-on-surface-variant dark:text-gray-300 mt-0.5">
-                  {selectedLocation.stretch}
+                  {selectedLocation.isLive ? 'AQUA-001 — Real-time Telemetry' : selectedLocation.stretch}
                 </p>
               </div>
               <button 
@@ -340,12 +382,12 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
             <div className="flex items-center gap-2 mt-2 text-on-surface-variant/80 dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">
               <span className="flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-primary" />
-                {selectedLocation.district}
+                {selectedLocation.isLive ? 'IoT Monitoring Station' : selectedLocation.district}
               </span>
               <span className="w-1 h-1 rounded-full bg-outline-variant mx-1" />
               <span className="flex items-center gap-1">
                 <Activity className="w-3.5 h-3.5 text-secondary" />
-                Scanned {selectedLocation.lastScanned}
+                {selectedLocation.isLive ? 'Real-time' : `Scanned ${selectedLocation.lastScanned}`}
               </span>
             </div>
           </div>
@@ -485,13 +527,21 @@ export default function LocationPage({ selectedLocation, setSelectedLocation, se
             </div>
           </div>
 
-          {/* Primary Action Button to navigate to Purity Report */}
+          {/* Blockchain Verification Badge for Live Buoy */}
+          {selectedLocation.isLive && (
+            <div className="relative z-10 bg-blue-500/10 border border-blue-500/30 rounded-xl p-2.5 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-blue-400" />
+              <span className="text-xs text-blue-400 font-medium">⛓️ Blockchain Verified: Pending</span>
+            </div>
+          )}
+
+          {/* Primary Action Button */}
           <div className="mt-auto pt-4 relative z-10">
             <button
               onClick={() => setCurrentRoute('purity')}
               className="w-full py-3.5 bg-primary text-on-primary font-bold text-base rounded-xl shadow-md hover:bg-primary-container active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              View Detailed Purity Report
+              {selectedLocation.isLive ? 'View Live Telemetry' : 'View Detailed Purity Report'}
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>

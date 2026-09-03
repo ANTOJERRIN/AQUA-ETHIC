@@ -2,74 +2,94 @@
 pragma solidity ^0.8.19;
 
 contract WaterQuality {
-    address public owner;
-
-    struct Record {
-        string sensorId;
-        string sourceType;
-        bytes32 dataHash;
+    struct Reading {
+        string deviceId;
+        string dataHash;
         uint256 timestamp;
+        bool verified;
+        address validator;
     }
 
-    mapping(string => Record) public records;
-    mapping(string => bool) public sensorExists;
-    string[] public sensorIds;
+    Reading[] public readings;
+    mapping(string => bool) public existingHashes;
+    mapping(string => uint256) public hashToIndex;
 
-    // ✅ FIX: Added event for auditing
-    event DataAnchored(string indexed sensorId, bytes32 dataHash, uint256 timestamp);
+    address public owner;
+
+    event ReadingStored(
+        string deviceId,
+        string dataHash,
+        uint256 timestamp,
+        uint256 index,
+        address validator
+    );
 
     constructor() {
         owner = msg.sender;
     }
 
-    // ✅ FIX: Added access control
     modifier onlyOwner() {
-        require(msg.sender == owner, "Not authorized to anchor data");
+        require(msg.sender == owner, "Only owner can call this");
         _;
     }
 
-    // ✅ FIX: Added duplicate check
-    function recordData(
-        string memory _sensorId,
-        string memory _sourceType,
-        bytes32 _dataHash
-    ) public onlyOwner {
-        require(!sensorExists[_sensorId], "Sensor already exists");
-        
-        records[_sensorId] = Record({
-            sensorId: _sensorId,
-            sourceType: _sourceType,
+    function storeReading(
+        string memory _deviceId,
+        string memory _dataHash,
+        uint256 _timestamp
+    ) public {
+        require(!existingHashes[_dataHash], "Hash already exists");
+
+        readings.push(Reading({
+            deviceId: _deviceId,
             dataHash: _dataHash,
-            timestamp: block.timestamp
-        });
-        
-        sensorExists[_sensorId] = true;
-        sensorIds.push(_sensorId);
-        
-        // ✅ FIX: Emit event for auditing
-        emit DataAnchored(_sensorId, _dataHash, block.timestamp);
+            timestamp: _timestamp,
+            verified: true,
+            validator: msg.sender
+        }));
+
+        existingHashes[_dataHash] = true;
+        hashToIndex[_dataHash] = readings.length - 1;
+
+        emit ReadingStored(_deviceId, _dataHash, _timestamp, readings.length - 1, msg.sender);
     }
 
-    function verifyRecord(
-        string memory _sensorId,
-        bytes32 _currentHash
-    ) public view returns (bool) {
-        require(sensorExists[_sensorId], "Sensor does not exist");
-        return records[_sensorId].dataHash == _currentHash;
+    function verifyReading(string memory _dataHash) public view returns (
+        bool exists,
+        bool verified,
+        string memory deviceId,
+        uint256 timestamp,
+        address validator
+    ) {
+        if (!existingHashes[_dataHash]) {
+            return (false, false, "", 0, address(0));
+        }
+
+        uint256 index = hashToIndex[_dataHash];
+        Reading storage reading = readings[index];
+
+        return (true, reading.verified, reading.deviceId, reading.timestamp, reading.validator);
     }
 
-    function getRecord(
-        string memory _sensorId
-    ) public view returns (Record memory) {
-        require(sensorExists[_sensorId], "Sensor does not exist");
-        return records[_sensorId];
+    function getTotalReadings() public view returns (uint256) {
+        return readings.length;
     }
 
-    function getAllSensorIds() public view returns (string[] memory) {
-        return sensorIds;
-    }
-
-    function getRecordCount() public view returns (uint256) {
-        return sensorIds.length;
+    function getReading(uint256 index) public view returns (
+        string memory deviceId,
+        string memory dataHash,
+        uint256 timestamp,
+        bool verified,
+        address validator
+    ) {
+        require(index < readings.length, "Index out of bounds");
+        Reading storage reading = readings[index];
+        return (
+            reading.deviceId,
+            reading.dataHash,
+            reading.timestamp,
+            reading.verified,
+            reading.validator
+        );
     }
 }

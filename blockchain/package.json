@@ -1,26 +1,36 @@
 {
-  "name": "aqua-ethic-blockchain",
-  "version": "1.0.0",
-  "description": "Blockchain data integrity layer for AQUA-ETHIC water quality monitoring",
-  "main": "index.js",
-  "scripts": {
-    "deploy": "npx hardhat run scripts/deploy.js --network localhost",
-    "deploy:sepolia": "npx hardhat run scripts/deploy.js --network sepolia",
-    "compile": "npx hardhat compile",
-    "clean": "npx hardhat clean",
-    "node": "npx hardhat node",
-    "test": "npx hardhat test",
-    "demo": "node terminalDemo.js help"
-  },
-  "keywords": ["blockchain", "ethereum", "hardhat", "water-quality", "aqua-ethic"],
-  "author": "AQUA-ETHIC Team",
-  "license": "MIT",
-  "type": "module",
-  "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
-    "hardhat": "^2.22.0"
-  },
-  "dependencies": {
-    "dotenv": "^16.3.1"
-  }
+    "name": "aqua-ethic-blockchain",
+    "version": "1.0.0",
+    "description": "Blockchain smart contract for AQUA-ETHIC water quality monitoring",
+    "main": "index.js",
+    "scripts": {
+        "compile": "npx hardhat compile",
+        "test": "npx hardhat test",
+        "deploy": "npx hardhat run scripts/deploy.js --network ganache",
+        "deploy:sepolia": "npx hardhat run scripts/deploy.js --network sepolia",
+        "node": "npx hardhat node"
+    },
+    "devDependencies": {
+        "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
+        "@nomicfoundation/hardhat-ethers": "^3.1.3",
+        "@nomicfoundation/hardhat-ignition": "^0.15.16",
+        "@nomicfoundation/hardhat-ignition-ethers": "^0.15.17",
+        "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+        "@nomicfoundation/hardhat-verify": "^2.1.3",
+        "@nomicfoundation/ignition-core": "^0.15.15",
+        "@typechain/ethers-v6": "^0.5.1",
+        "@typechain/hardhat": "^9.1.0",
+        "@types/chai": "^4.3.20",
+        "@types/mocha": "^10.0.10",
+        "@types/node": "^26.4.0",
+        "chai": "^4.5.0",
+        "dotenv": "^16.0.3",
+        "ethers": "^6.17.0",
+        "hardhat": "^2.22.0",
+        "hardhat-gas-reporter": "^1.0.10",
+        "solidity-coverage": "^0.8.17",
+        "ts-node": "^10.9.2",
+        "typechain": "^8.3.2",
+        "typescript": "^7.0.2"
+    }
 }

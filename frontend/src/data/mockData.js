@@ -2,7 +2,7 @@
 export const LOCATIONS = [
   {
     id: "ganga-kanpur",
-    deviceId: "ganga-kanpur",
+    deviceId: "AQUA-001",
     name: "Ganga River",
     stretch: "Kanpur Stretch",
     district: "Uttar Pradesh",

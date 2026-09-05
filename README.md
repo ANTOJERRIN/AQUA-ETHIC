@@ -88,6 +88,54 @@ A reading can be verified by its hash against both the database and blockchain s
 ### Historical telemetry
 The API supports latest-reading and historical-reading queries for individual devices.
 
+## 👨‍💻 About Me
+
+I’m **Jerrin Anto**, a Computer Science (AI & ML) student and builder working across **AI, cloud, full-stack development, Flutter, and developer communities**. I enjoy turning ideas into working products, especially projects that combine software, AI, and real-world impact.
+
+## 🚀 Featured Projects
+
+### 🌊 AQUA-ETHIC
+**IoT + Blockchain Water Quality Monitoring**
+
+AQUA-ETHIC connects water-quality sensing, a Node.js/Express backend, SQLite persistence, SHA-256 data integrity, and blockchain anchoring into a single verifiable pipeline. Built as a **DECODE SIH Hackathon** project.
+
+### ❤️ Cardio.AI / WithLove
+**AI-Powered Heart Health Monitoring**
+
+A Flutter-based health application concept focused on cardiac-risk awareness. The product flow includes a health-input assessment, risk-result experience, AI chat support, and doctor-connect functionality, with an extended concept for **AR-based heart visualization**.
+
+### 👴 SilverCare / SilverBot
+**AI Companion for Elderly Care**
+
+An AI assistant concept designed to help elderly users with voice interaction, medicine reminders, location/map recognition, AI-assisted checkups, and companion-style interaction.
+
+### 🍱 QuickNest
+**Campus Delivery & Food Discovery**
+
+A campus-focused delivery concept combining food ordering, student-friendly discounts, sports-booking offers, and mood-based food recommendations.
+
+### 🧠 EvolveED.AI
+**AI-Powered Learning Assistant**
+
+A learning-platform concept that combines YouTube learning content with AI-generated summaries and an interactive AI tutor experience.
+
+### 🍽️ JFOODS
+**Food & Service Startup Project**
+
+A startup initiative built with a team to explore technology-driven food and service solutions, including work connected with **Central Railways and NHAI bus operations**.
+
+## 🏆 Achievements
+
+- 🥇 **Winner — Short Film Making Competition**
+- 👑 **Mr. Fresher — Title Winner**
+- 🚀 **Selected in the Top 100 Teams** in a hackathon
+- 🏅 Participated in major student hackathons including **Google Hackathons, Namma Hack 2026, AI Rena 2.0, and 24-hour hackathons**
+- ☁️ Earned multiple **Google Cloud skill badges** and completed Google-focused learning programs
+- 🤖 Completed **Google GenAI Academy** learning and worked on multiple AI-focused projects
+- 🌱 Selected as a **GSSoC contributor**
+- 👥 Built and contributed to student tech communities focused on **AI, cloud, software development, and workshops**
+- 🧑‍💻 Worked across **AI/GenAI, Flutter, backend APIs, cloud, and product prototyping** through projects, internships, and hackathons
+
 ## 📁 Repository Structure
 
 ```text

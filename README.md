@@ -1,4 +1,4 @@
-# 🌊 AQUA-ETHIC
+# 🌊 RIVER
 
 **AQUA-ETHIC** is a water-quality monitoring and data-integrity platform that connects IoT telemetry, a backend API, local persistence, and blockchain-based verification into one pipeline.
 

@@ -69,6 +69,7 @@ export default function RiverBackdrop({ config, darkMode }) {
       className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none transition-all duration-500 ease-out"
       aria-hidden="true"
     >
+      <div className="waterflow-current" />
       {/* 1. Ambient Lighting Glow Behind the Emblem */}
       {glowIntensity > 0 && (
         <div 

@@ -196,7 +196,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen relative flex flex-col bg-surface-bg/85 dark:bg-dark-bg/90 text-on-surface dark:text-gray-100 transition-colors duration-300">
+    <div className="waterflow-shell min-h-screen relative flex flex-col bg-surface-bg/85 dark:bg-dark-bg/90 text-on-surface dark:text-gray-100 transition-colors duration-300">
       <RiverBackdrop config={backdropConfig} darkMode={darkMode} />
 
       <Header
